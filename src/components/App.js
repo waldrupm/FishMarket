@@ -4,6 +4,7 @@ import Order from './Order';
 import Inventory from './Inventory';
 import sampleFishes from '../sample-fishes';
 import Fish from './Fish';
+import base from '../base';
 
 class App extends React.Component {
   constructor() {
@@ -13,7 +14,33 @@ class App extends React.Component {
       fishes: {},
       order: {}
     }
+  };
+
+  // Bind to firebase
+  componentDidMount() {
+    const { params } = this.props.match;
+    // Order information
+    const localStorageRef = localStorage.getItem(params.storeId);
+    if(localStorageRef) {
+      this.setState({ order: JSON.parse(localStorageRef) });
+    }
+    this.ref = base.syncState(`${params.storeId}/fishes`, {
+      context: this,
+      state: 'fishes'
+    });
+
+  };
+  
+  // save order state
+  componentDidUpdate() {
+    localStorage.setItem(this.props.match.params.storeId, JSON.stringify(this.state.order));
   }
+
+  //remove firebase binding
+  componentWillUnmount() {
+    base.removeBinding(this.ref);
+  };
+
   // Adds fish to catalog
   addFish = fish => {
     const fishes = { ...this.state.fishes};
@@ -47,7 +74,7 @@ class App extends React.Component {
             {Object.keys(this.state.fishes).map(key => <Fish key={key} index={key} details={this.state.fishes[key]} addToOrder={this.addToOrder} />)}
           </ul>
         </div>
-        <Order />
+        <Order fishes={this.state.fishes} order={this.state.order} />
         <Inventory addFish={this.addFish} loadSampleFishes={this.loadSampleFishes}/>
       </div>
     )
