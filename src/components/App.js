@@ -41,6 +41,7 @@ class App extends React.Component {
     base.removeBinding(this.ref);
   };
 
+  
   // Adds fish to catalog
   addFish = fish => {
     const fishes = { ...this.state.fishes};
@@ -48,6 +49,13 @@ class App extends React.Component {
     this.setState({
       fishes: fishes
     });
+  };
+  
+  // Handle EditFishForm changes
+  updateFish = (key, updatedFish) => {
+    const fishes = { ...this.state.fishes };
+    fishes[key] = updatedFish;
+    this.setState( { fishes });
   };
 
   // Will load example fishes into the catalog
@@ -75,7 +83,7 @@ class App extends React.Component {
           </ul>
         </div>
         <Order fishes={this.state.fishes} order={this.state.order} />
-        <Inventory addFish={this.addFish} loadSampleFishes={this.loadSampleFishes}/>
+        <Inventory fishes={this.state.fishes} addFish={this.addFish} loadSampleFishes={this.loadSampleFishes} updateFish={this.updateFish}/>
       </div>
     )
   }
